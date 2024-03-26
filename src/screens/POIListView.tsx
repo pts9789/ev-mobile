@@ -2,13 +2,16 @@ import React, {useState, useEffect} from 'react';
 import { Text, StyleSheet, ActivityIndicator, View, ScrollView, Platform, Linking, FlatList, TouchableOpacity} from 'react-native';
 import axios from 'axios';
 import useGetUserLocation from '../hooks/useGetUserLocation';
+import { useNavigation } from '@react-navigation/native';
+import POIListItem from '../components/POIListItem';
 
 // TODO: Type out POI Payload
 // The entire POI Payload provides details that we may want to use down the line
 
 const POIListView = () => {
+    const navigation = useNavigation();
     const [userLocation, userLocationErrorMsg] = useGetUserLocation()
-    const [chargePoints, setChargePoints] = useState(null)
+    const [chargePoints, setChargePoints] = useState<any>(null)
   
     // GET POI Sites from Open Charge
     useEffect(() => {
@@ -45,19 +48,23 @@ const POIListView = () => {
         )
       }
   
-    return (
+      return (
         <FlatList
         showsHorizontalScrollIndicator={false}
         data={chargePoints}
         keyExtractor={(item) => item.ID}
         renderItem={({item}) => {
             return(
-                <Text>{item.AddressInfo.AddressLine1}</Text>
+                <TouchableOpacity
+                    onPress={() => console.log('PRESSED')}
+                    >
+                    <POIListItem title={item.AddressInfo.Title} distance={item.AddressInfo.Distance} />
+                </TouchableOpacity>
             )
         }}
       />
     )
-}
+  }
 
 const styles = StyleSheet.create({
   body: {
