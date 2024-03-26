@@ -27,7 +27,20 @@ const POIListView = () => {
             }
           }
           const { data } = await axios.request(options);
-          setChargePoints(data)
+          const filtered = data.reduce((res: any, item: any) => {
+            res.push({
+              address: item.AddressInfo.AddressLine1,
+              accessNotes: item.AddressInfo.AccessComments,
+              contactInfo: item.AddressInfo.ContactTelephone1,
+              distance: item.AddressInfo.Distance,
+              id: item.ID,
+              lattitude: item.AddressInfo.Latitude,
+              longitude: item.AddressInfo.Longitude,
+              title: item.AddressInfo.Title,
+            });
+            return res;
+          }, []);
+          setChargePoints(filtered)
         })()
       }
     }, [userLocation])
@@ -47,7 +60,7 @@ const POIListView = () => {
           </View>
         )
       }
-  
+      console.log('chargePoints >>>', chargePoints)
       return (
         <FlatList
         showsHorizontalScrollIndicator={false}
@@ -56,9 +69,9 @@ const POIListView = () => {
         renderItem={({item}) => {
             return(
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('POIDetail', {details: item,})}
+                    onPress={() => navigation.navigate('POIDetail', {details: item})}
                     >
-                    <POIListItem title={item.AddressInfo.Title} distance={item.AddressInfo.Distance} />
+                    <POIListItem title={item.title} distance={item.distance} />
                 </TouchableOpacity>
             )
         }}
