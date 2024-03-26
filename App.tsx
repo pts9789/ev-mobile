@@ -21,6 +21,7 @@ const App = () => (
         <Stack.Screen
         name="POIDetail"
         component={POIDetail}
+        options={{ title: '' }}
       />
     </Stack.Navigator>
   </NavigationContainer>

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { Text, StyleSheet, ActivityIndicator, View, ScrollView, Platform, Linking, FlatList, TouchableOpacity} from 'react-native';
+import { Text, StyleSheet, ActivityIndicator, View, FlatList, TouchableOpacity} from 'react-native';
 import axios from 'axios';
 import useGetUserLocation from '../hooks/useGetUserLocation';
 import { useNavigation } from '@react-navigation/native';
@@ -60,12 +60,11 @@ const POIListView = () => {
           </View>
         )
       }
-      console.log('chargePoints >>>', chargePoints)
       return (
         <FlatList
         showsHorizontalScrollIndicator={false}
         data={chargePoints}
-        keyExtractor={(item) => item.ID}
+        keyExtractor={(item) => item.id}
         renderItem={({item}) => {
             return(
                 <TouchableOpacity
