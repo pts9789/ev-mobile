@@ -56,7 +56,7 @@ const POIListView = () => {
         renderItem={({item}) => {
             return(
                 <TouchableOpacity
-                    onPress={() => console.log('PRESSED')}
+                    onPress={() => navigation.navigate('POIDetail', {details: item,})}
                     >
                     <POIListItem title={item.AddressInfo.Title} distance={item.AddressInfo.Distance} />
                 </TouchableOpacity>
