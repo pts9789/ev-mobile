@@ -1,25 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import { Text, StyleSheet, ActivityIndicator, View, ScrollView, Platform, Linking, FlatList, TouchableOpacity} from 'react-native';
 import axios from 'axios';
-import * as Location from 'expo-location';
+import useGetUserLocation from '../hooks/useGetUserLocation';
+
 // TODO: Type out POI Payload
 // The entire POI Payload provides details that we may want to use down the line
 
 const POIListView = () => {
-    const [location, setLocation] = useState<any>(null);
-    const [errorMsg, setErrorMsg] = useState<any>(null);
+    const [userLocation, userLocationErrorMsg] = useGetUserLocation()
+    const [chargePoints, setChargePoints] = useState(null)
   
+    // GET POI Sites from Open Charge
     useEffect(() => {
-      (async () => {
-        
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-          return;
-        }
-  
-        let userLocation = await Location.getCurrentPositionAsync({});
-        const options = {
+      if (userLocation) {
+        (async () => {
+          const options = {
             method: 'GET',
             url: 'https://api.openchargemap.io/v3/poi',
             params: {maxresults: '20', latitude: `${userLocation.coords.latitude}`, longitude: `${userLocation.coords.longitude}`},
@@ -29,28 +24,48 @@ const POIListView = () => {
             }
           }
           const { data } = await axios.request(options);
-          console.log('data >>>>', data)
-        setLocation(location);
-      })();
-    }, []);
-  
-    let text = 'Waiting..';
-    if (errorMsg) {
-      text = errorMsg;
-    } else if (location) {
-      text = JSON.stringify(location);
-    }
-  
+          setChargePoints(data)
+        })()
+      }
+    }, [userLocation])
 
-  return (
-    <View>
-        <Text>{text}</Text>
-    </View>
-  )
+    if (!chargePoints) {
+        return (
+          <View style={styles.body}>
+            <Text style={{marginBottom: 20}}>Searching for Charging Points Near You</Text>
+            <ActivityIndicator />
+          </View>
+        )
+      }
+      if (userLocationErrorMsg) {
+        return (
+          <View style={styles.body}>
+            <Text>We're having trouble verifying your location...</Text>
+          </View>
+        )
+      }
+  
+    return (
+        <FlatList
+        showsHorizontalScrollIndicator={false}
+        data={chargePoints}
+        keyExtractor={(item) => item.ID}
+        renderItem={({item}) => {
+            return(
+                <Text>{item.AddressInfo.AddressLine1}</Text>
+            )
+        }}
+      />
+    )
 }
 
 const styles = StyleSheet.create({
-
+  body: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%'
+  },
 });
 
 export default POIListView;
